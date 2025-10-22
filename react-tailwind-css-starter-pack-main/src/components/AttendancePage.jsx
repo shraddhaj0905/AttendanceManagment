@@ -132,154 +132,154 @@ const AttendancePage = () => {
 
 
     // --- Audio transcription functions (unchanged logic, assumes audio lists PRESENT students) ---
-    const handleAudioUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setAudioFile(file);
-        }
-    };
+    // const handleAudioUpload = (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         setAudioFile(file);
+    //     }
+    // };
 
-    const transcribeAudio = async () => {
-        if (!audioFile) {
-            alert('Please upload an audio file first.');
-            return;
-        }
+    // const transcribeAudio = async () => {
+    //     if (!audioFile) {
+    //         alert('Please upload an audio file first.');
+    //         return;
+    //     }
 
-        setIsTranscribing(true);
-        setTranscriptionError(null);
-        setTranscriptionText('');
+    //     setIsTranscribing(true);
+    //     setTranscriptionError(null);
+    //     setTranscriptionText('');
 
-        const formData = new FormData();
-        formData.append('audio', audioFile);
+    //     const formData = new FormData();
+    //     formData.append('audio', audioFile);
 
-        try {
-            const response = await fetch('http://localhost:4000/api/gemini-transcribe', {
-                method: 'POST',
-                body: formData,
-            });
+    //     try {
+    //         const response = await fetch('http://localhost:4000/api/gemini-transcribe', {
+    //             method: 'POST',
+    //             body: formData,
+    //         });
 
-            const data = await response.json();
-            if (response.ok && data && data.transcript) {
-                setTranscriptionText(data.transcript);
-                const transcribedText = data.transcript.toLowerCase();
+    //         const data = await response.json();
+    //         if (response.ok && data && data.transcript) {
+    //             setTranscriptionText(data.transcript);
+    //             const transcribedText = data.transcript.toLowerCase();
 
-                // Update attendance based on transcription (mark matching rolls/names as present)
-                // Assumption: Audio contains PRESENT students saying their roll number/name.
-                const updatedAttendance = attendanceData.map(student => {
-                    const studentNameLower = student.name.toLowerCase(); // Assuming student.name is the roll number
-                    // If student's identifier is found in transcript, mark as PRESENT
-                    // Note: This OVERWRITES previous status (e.g., if OCR marked absent, audio can mark present)
-                    if (transcribedText.includes(studentNameLower)) {
-                        return { ...student, present: true };
-                    }
-                    // If not found in transcript, keep their CURRENT status (could be present or absent from OCR/manual)
-                    return student;
-                });
-                setAttendanceData(updatedAttendance);
+    //             // Update attendance based on transcription (mark matching rolls/names as present)
+    //             // Assumption: Audio contains PRESENT students saying their roll number/name.
+    //             const updatedAttendance = attendanceData.map(student => {
+    //                 const studentNameLower = student.name.toLowerCase(); // Assuming student.name is the roll number
+    //                 // If student's identifier is found in transcript, mark as PRESENT
+    //                 // Note: This OVERWRITES previous status (e.g., if OCR marked absent, audio can mark present)
+    //                 if (transcribedText.includes(studentNameLower)) {
+    //                     return { ...student, present: true };
+    //                 }
+    //                 // If not found in transcript, keep their CURRENT status (could be present or absent from OCR/manual)
+    //                 return student;
+    //             });
+    //             setAttendanceData(updatedAttendance);
 
-            } else {
-                setTranscriptionError('Transcription failed or no text found.');
-                setTranscriptionText('');
-            }
-        } catch (error) {
-            console.error('Error transcribing audio:', error);
-            setTranscriptionError('An error occurred during audio transcription.');
-            setTranscriptionText('');
-        } finally {
-            setIsTranscribing(false);
-        }
-    };
+    //         } else {
+    //             setTranscriptionError('Transcription failed or no text found.');
+    //             setTranscriptionText('');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error transcribing audio:', error);
+    //         setTranscriptionError('An error occurred during audio transcription.');
+    //         setTranscriptionText('');
+    //     } finally {
+    //         setIsTranscribing(false);
+    //     }
+    // };
 
-    // --- downloadTranscriptionAsPdf function remains the same ---
-    const downloadTranscriptionAsPdf = () => {
-        const pdf = new jsPDF();
-        const text = transcriptionText;
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const textWidth = pageWidth - 2 * margin;
-        const lineHeight = 5; // Adjust line height as needed
+    // // --- downloadTranscriptionAsPdf function remains the same ---
+    // const downloadTranscriptionAsPdf = () => {
+    //     const pdf = new jsPDF();
+    //     const text = transcriptionText;
+    //     const pageWidth = pdf.internal.pageSize.getWidth();
+    //     const pageHeight = pdf.internal.pageSize.getHeight();
+    //     const margin = 10;
+    //     const textWidth = pageWidth - 2 * margin;
+    //     const lineHeight = 5; // Adjust line height as needed
 
-        pdf.setFontSize(12);
+    //     pdf.setFontSize(12);
 
-        const splitText = pdf.splitTextToSize(text, textWidth);
-        let yPosition = margin;
+    //     const splitText = pdf.splitTextToSize(text, textWidth);
+    //     let yPosition = margin;
 
-        splitText.forEach(line => {
-            const lineSize = pdf.getTextDimensions(line, { fontSize: 12 }).h;
+    //     splitText.forEach(line => {
+    //         const lineSize = pdf.getTextDimensions(line, { fontSize: 12 }).h;
 
-            if (yPosition + lineSize + margin > pageHeight) {
-                pdf.addPage();
-                yPosition = margin; // Reset Y position for new page
-            }
-            pdf.text(line, margin, yPosition);
-            yPosition += lineHeight; // Increment Y position
-        });
+    //         if (yPosition + lineSize + margin > pageHeight) {
+    //             pdf.addPage();
+    //             yPosition = margin; // Reset Y position for new page
+    //         }
+    //         pdf.text(line, margin, yPosition);
+    //         yPosition += lineHeight; // Increment Y position
+    //     });
 
-        pdf.save('transcription.pdf');
-    };
+    //     pdf.save('transcription.pdf');
+    // };
 
 
-    // --- Head Count functions (unchanged) ---
-    const handleHeadCountImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setHeadCountImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => setPreviewHeadCountImage(reader.result);
-            reader.readAsDataURL(file);
-            setHeadCount(null);
-            setHeadCountError('');
-            setProcessedHeadCountImage(null);
-        }
-    };
+    // // --- Head Count functions (unchanged) ---
+    // const handleHeadCountImageUpload = (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         setHeadCountImage(file);
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => setPreviewHeadCountImage(reader.result);
+    //         reader.readAsDataURL(file);
+    //         setHeadCount(null);
+    //         setHeadCountError('');
+    //         setProcessedHeadCountImage(null);
+    //     }
+    // };
 
-    const removeHeadCountImage = () => {
-        setHeadCountImage(null);
-        setPreviewHeadCountImage(null);
-        setHeadCount(null);
-        setHeadCountError('');
-        setProcessedHeadCountImage(null);
-    };
+    // const removeHeadCountImage = () => {
+    //     setHeadCountImage(null);
+    //     setPreviewHeadCountImage(null);
+    //     setHeadCount(null);
+    //     setHeadCountError('');
+    //     setProcessedHeadCountImage(null);
+    // };
 
-    const countHeads = async () => {
-        if (!headCountImage) {
-            setHeadCountError('Please upload an image for head counting.');
-            return;
-        }
+    // const countHeads = async () => {
+    //     if (!headCountImage) {
+    //         setHeadCountError('Please upload an image for head counting.');
+    //         return;
+    //     }
 
-        setIsCountingHeads(true);
-        setHeadCountError('');
-        setHeadCount(null);
-        setProcessedHeadCountImage(null);
+    //     setIsCountingHeads(true);
+    //     setHeadCountError('');
+    //     setHeadCount(null);
+    //     setProcessedHeadCountImage(null);
 
-        const formData = new FormData();
-        formData.append('image', headCountImage);
+    //     const formData = new FormData();
+    //     formData.append('image', headCountImage);
 
-        try {
-            const response = await fetch('http://localhost:4000/api/headcount', {
-                method: 'POST',
-                body: formData,
-            });
+    //     try {
+    //         const response = await fetch('http://localhost:4000/api/headcount', {
+    //             method: 'POST',
+    //             body: formData,
+    //         });
 
-            if (response.ok) {
-                const data = await response.json();
-                setHeadCount(data.headCount);
-                // Backend needs to return outputImage for this to work
-                // if (data.outputImage) {
-                //     setProcessedHeadCountImage(`data:image/jpeg;base64,${data.outputImage}`);
-                // }
-            } else {
-                const errorMessageText = await response.text();
-                setHeadCountError(`Error counting heads: ${errorMessageText || response.statusText}`);
-            }
-        } catch (error) {
-            console.error('Error counting heads:', error);
-            setHeadCountError('An error occurred while counting heads.');
-        } finally {
-            setIsCountingHeads(false);
-        }
-    };
+    //         if (response.ok) {
+    //             const data = await response.json();
+    //             setHeadCount(data.headCount);
+    //             // Backend needs to return outputImage for this to work
+    //             // if (data.outputImage) {
+    //             //     setProcessedHeadCountImage(`data:image/jpeg;base64,${data.outputImage}`);
+    //             // }
+    //         } else {
+    //             const errorMessageText = await response.text();
+    //             setHeadCountError(`Error counting heads: ${errorMessageText || response.statusText}`);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error counting heads:', error);
+    //         setHeadCountError('An error occurred while counting heads.');
+    //     } finally {
+    //         setIsCountingHeads(false);
+    //     }
+    // };
 
     // --- downloadAttendancePdf function remains the same ---
     const downloadAttendancePdf = () => {
@@ -452,6 +452,7 @@ const AttendancePage = () => {
     // Minor tweaks for better layout/feedback can be added if needed
     return (
         <div className="p-6 md:p-8 bg-gray-50 min-h-screen"> {/* Added background color */}
+
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                 <div>
                     <h2 className="text-3xl font-bold text-gray-800">{className}</h2>
@@ -528,17 +529,17 @@ const AttendancePage = () => {
                 </div>
 
                 {/* Audio Transcription Section */}
-                 <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200"> {/* Added border */}
-                     <h3 className="text-xl font-semibold text-indigo-700 mb-4">2. Audio (Present List)</h3> {/* Updated title */}
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="audio-upload">Upload Audio (Present)</label> {/* Added htmlFor */}
+                 {/* <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200"> 
+                     <h3 className="text-xl font-semibold text-indigo-700 mb-4">2. Audio (Present List)</h3> 
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="audio-upload">Upload Audio (Present)</label> 
                     <input
-                        id="audio-upload" // Added id
+                        id="audio-upload" 
                         type="file"
                         accept="audio/*"
                         onChange={handleAudioUpload}
                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-3" // Tailwind styled input
                     />
-                     {audioFile && <p className="text-xs text-gray-500 mb-3">Selected: {audioFile.name}</p>} {/* Show selected file name */}
+                     {audioFile && <p className="text-xs text-gray-500 mb-3">Selected: {audioFile.name}</p>} 
                     <button
                         onClick={transcribeAudio}
                          className={`mt-1 w-full font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-opacity-50 transition duration-150 ease-in-out text-sm ${isTranscribing || !audioFile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700 text-white focus:ring-blue-400'}`}
@@ -556,7 +557,7 @@ const AttendancePage = () => {
                                 readOnly
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 text-sm bg-gray-50" // Adjusted style
                             />
-                            {/* Download Transcription PDF button (optional) */}
+                           
                             <button
                                 onClick={downloadTranscriptionAsPdf}
                                 className="mt-2 text-sm text-indigo-600 hover:text-indigo-800"
@@ -565,12 +566,12 @@ const AttendancePage = () => {
                             </button>
                         </div>
                     )}
-                </div>
+                </div> */}
 
                 {/* Head Count Section */}
-                 <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200"> {/* Added border */}
+                 {/* <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200"> 
                      <h3 className="text-xl font-semibold text-indigo-700 mb-4">3. Head Count</h3>
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="headcount-image-upload">Upload Class Image</label> {/* Added htmlFor */}
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="headcount-image-upload">Upload Class Image</label>
                     <input
                          id="headcount-image-upload" // Added id
                         type="file"
@@ -599,8 +600,8 @@ const AttendancePage = () => {
                     </button>
                     {headCount !== null && <p className="mt-2 text-green-700 text-sm font-semibold">Detected: {headCount} heads</p>}
                     {headCountError && <p className="mt-2 text-red-600 text-sm">{headCountError}</p>}
-                     {/* Processed image display (requires backend support) */}
-                </div>
+                    
+                </div> */}
             </div>
 
             {/* Attendance Marking Section */}

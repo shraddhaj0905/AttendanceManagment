@@ -15,7 +15,7 @@
 
 const express = require("express");
 const { registerTeacher, loginTeacher } = require("../controllers/authController");
-const { markAttendance, getTeacherData, getRecentAttendance, getAttendanceStats, getAbsentStudents } = require("../controllers/attendanceController");
+const { markAttendance, getTeacherData, getRecentAttendance,getLowAttendanceStudents, getAttendanceStats, getAbsentStudents } = require("../controllers/attendanceController");
 const authTeacher = require("../middleware/authTeacher");
 const isAuth = require("../middleware/isAuth");
 
@@ -29,4 +29,7 @@ router.get("/recent",authTeacher,getRecentAttendance);
 
 router.get("/stats",authTeacher,getAttendanceStats);
 router.get('/absentees', authTeacher ,getAbsentStudents);
+router.get("/low-attendance", authTeacher, getLowAttendanceStudents);
+
+
 module.exports = router;

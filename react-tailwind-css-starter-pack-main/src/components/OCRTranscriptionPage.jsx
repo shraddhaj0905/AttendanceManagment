@@ -118,84 +118,84 @@ const OcrTranscriptionPage = () => {
         }
     };
 
-    const transcribeAudio = async () => {
-        if (!audioFile) {
-            alert('Please upload an audio file first.');
-            return;
-        }
+    // const transcribeAudio = async () => {
+    //     if (!audioFile) {
+    //         alert('Please upload an audio file first.');
+    //         return;
+    //     }
 
-        setIsTranscribing(true);
-        setTranscriptionError(null);
-        setTranscriptionText('');
+    //     setIsTranscribing(true);
+    //     setTranscriptionError(null);
+    //     setTranscriptionText('');
 
-        const formData = new FormData();
-        formData.append('audio', audioFile);
+    //     const formData = new FormData();
+    //     formData.append('audio', audioFile);
 
-        try {
-            const response = await fetch('http://localhost:4000/api/gemini-transcribe', {
-                method: 'POST',
-                body: formData,
-            });
+    //     try {
+    //         const response = await fetch('http://localhost:4000/api/gemini-transcribe', {
+    //             method: 'POST',
+    //             body: formData,
+    //         });
 
-            const data = await response.json();
-            if (response.ok && data && data.transcript) {
-                setTranscriptionText(data.transcript);
-                const transcribedText = data.transcript.toLowerCase();
+    //         const data = await response.json();
+    //         if (response.ok && data && data.transcript) {
+    //             setTranscriptionText(data.transcript);
+    //             const transcribedText = data.transcript.toLowerCase();
                 
-                // Create attendance data based on transcription
-                const startRoll = 23201;
-                const endRoll = 23287;
-                const students = Array.from({ length: endRoll - startRoll + 1 }, (_, i) => {
-                    const rollNumber = startRoll + i;
-                    const studentId = rollNumber;
-                    const name = rollNumber.toString().padStart(5, '0');
-                    const nameLower = name.toLowerCase();
-                    const present = nameLower.split(' ').some(part => transcribedText.includes(part));
-                    return { studentId, name, present };
-                });
+    //             // Create attendance data based on transcription
+    //             const startRoll = 23201;
+    //             const endRoll = 23287;
+    //             const students = Array.from({ length: endRoll - startRoll + 1 }, (_, i) => {
+    //                 const rollNumber = startRoll + i;
+    //                 const studentId = rollNumber;
+    //                 const name = rollNumber.toString().padStart(5, '0');
+    //                 const nameLower = name.toLowerCase();
+    //                 const present = nameLower.split(' ').some(part => transcribedText.includes(part));
+    //                 return { studentId, name, present };
+    //             });
                 
-                // Save to localStorage to pass data back to AttendancePage
-                localStorage.setItem('transcriptionAttendance', JSON.stringify(students));
-            } else {
-                setTranscriptionError('Transcription failed or no text found.');
-                setTranscriptionText('');
-            }
-        } catch (error) {
-            console.error('Error transcribing audio:', error);
-            setTranscriptionError('An error occurred during audio transcription.');
-            setTranscriptionText('');
-        } finally {
-            setIsTranscribing(false);
-        }
-    };
+    //             // Save to localStorage to pass data back to AttendancePage
+    //             localStorage.setItem('transcriptionAttendance', JSON.stringify(students));
+    //         } else {
+    //             setTranscriptionError('Transcription failed or no text found.');
+    //             setTranscriptionText('');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error transcribing audio:', error);
+    //         setTranscriptionError('An error occurred during audio transcription.');
+    //         setTranscriptionText('');
+    //     } finally {
+    //         setIsTranscribing(false);
+    //     }
+    // };
 
-    const downloadTranscriptionAsPdf = () => {
-        const pdf = new jsPDF();
-        const text = transcriptionText;
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        const textWidth = pageWidth - 2 * margin;
-        const lineHeight = 5;
+    // const downloadTranscriptionAsPdf = () => {
+    //     const pdf = new jsPDF();
+    //     const text = transcriptionText;
+    //     const pageWidth = pdf.internal.pageSize.getWidth();
+    //     const pageHeight = pdf.internal.pageSize.getHeight();
+    //     const margin = 10;
+    //     const textWidth = pageWidth - 2 * margin;
+    //     const lineHeight = 5;
 
-        pdf.setFontSize(12);
+    //     pdf.setFontSize(12);
 
-        const splitText = pdf.splitTextToSize(text, textWidth);
-        let yPosition = margin;
+    //     const splitText = pdf.splitTextToSize(text, textWidth);
+    //     let yPosition = margin;
 
-        splitText.forEach(line => {
-            const lineSize = pdf.getTextDimensions(line, { fontSize: 12 }).h;
+    //     splitText.forEach(line => {
+    //         const lineSize = pdf.getTextDimensions(line, { fontSize: 12 }).h;
 
-            if (yPosition + lineSize + margin > pageHeight) {
-                pdf.addPage();
-                yPosition = margin;
-            }
-            pdf.text(line, margin, yPosition);
-            yPosition += lineHeight;
-        });
+    //         if (yPosition + lineSize + margin > pageHeight) {
+    //             pdf.addPage();
+    //             yPosition = margin;
+    //         }
+    //         pdf.text(line, margin, yPosition);
+    //         yPosition += lineHeight;
+    //     });
 
-        pdf.save('transcription.pdf');
-    };
+    //     pdf.save('transcription.pdf');
+    // };
 
     return (
         <div className="p-8">
@@ -262,7 +262,7 @@ const OcrTranscriptionPage = () => {
                     )}
                 </div>
                 
-                {/* Audio Transcription Section */}
+                {/* Audio Transcription Section 
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-xl font-semibold text-indigo-600 mb-4">Audio Transcription</h3>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Upload Audio for Transcription</label>
@@ -296,7 +296,7 @@ const OcrTranscriptionPage = () => {
                             </button>
                         </div>
                     )}
-                </div>
+                </div> */}
             </div>
         </div>
     );

@@ -274,42 +274,30 @@ useEffect(() => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6">
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-                <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                        <div className="h-10 w-10 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center shadow-md">
-                            <span className="text-white font-bold text-xl">S</span>
-                        </div>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Student Portal</h1>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button variant="ghost" size="sm" className="relative">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">3</span>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="flex items-center gap-2 hover:bg-gray-100 transition-colors"
-                            onClick={handleViewProfile}
-                        >
-                            <img
-                                src={studentData.profileImage || "/api/placeholder/32/32"}
-                                alt={studentData.name || "Profile"}
-                                className="h-8 w-8 rounded-full border border-gray-200 object-cover"
-                            />
-                            <span className="font-medium">{studentData.name || "Student"}</span>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="flex items-center gap-2 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors"
-                            onClick={handleLogout}
-                        >
-                            <LogOut className="h-4 w-4" />
-                            <span>Logout</span>
-                        </Button>
-                    </div>
+            {/* TEACHER-LIKE NAVBAR */}
+            <header className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
+            <div className="container mx-auto px-6 py-3 flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-lg">S</span>
                 </div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                    Student Dashboard
+                </h1>
+                </div>
+
+                {/* Navbar buttons */}
+                <nav className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
+                <button
+                    className="flex items-center gap-2 hover:text-indigo-600 transition-colors"
+                    onClick={() => navigate("/")}
+                >
+                    Home
+                </button>
+                </nav>
+            </div>
             </header>
+
 
             <main className="container mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
@@ -471,3 +459,10 @@ useEffect(() => {
 };
 
 export default StudentDashboard;
+
+
+
+
+
+
+

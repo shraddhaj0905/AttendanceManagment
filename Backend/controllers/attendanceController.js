@@ -4,6 +4,38 @@ const Student = require("../models/Student");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// exports.getTeacherData = async (req, res) => {
+//     try {
+//         const token = req.headers.authorization?.split(" ")[1];
+//         if (!token) return res.status(401).json({ message: "No token provided" });
+
+//         let decoded;
+//         try {
+//             decoded = jwt.verify(token, JWT_SECRET);
+//         } catch (err) {
+//             return res.status(403).json({ message: "Invalid or expired token" });
+//         }
+
+//         const teacherId = decoded.id;
+//         const teacher = await Teacher.findById(teacherId).select("subjects");
+//         if (!teacher) {
+//             return res.status(404).json({ message: "Teacher not found" });
+//         }
+
+//         // 🔹 Add attendance count for each subject
+//         const subjectsWithAttendance = await Promise.all(
+//             teacher.subjects.map(async (subject) => {
+//                 const attendanceCount = await Attendance.countDocuments({ subject });
+//                 return { name: subject, attendanceCount };
+//             })
+//         );
+
+//         res.json({ subjects: subjectsWithAttendance });
+//     } catch (error) {
+//         console.error("Error fetching teacher data:", error);
+//         res.status(500).json({ message: "Internal server error" });
+//     }
+// };
 exports.getTeacherData = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -18,17 +50,33 @@ exports.getTeacherData = async (req, res) => {
 
         const teacherId = decoded.id;
 
-        const teacher = await Teacher.findById(teacherId).select("subjects");
+        // Fetch teacher with attendanceRecords
+        const teacher = await Teacher.findById(teacherId).select("subjects attendanceRecords");
         if (!teacher) {
             return res.status(404).json({ message: "Teacher not found" });
         }
 
-        res.json({ subjects: teacher.subjects });
+        // Count attendance for each subject
+        const subjectsWithAttendance = teacher.subjects.map(subject => {
+            const count = teacher.attendanceRecords.filter(
+                record => record.subject === subject
+            ).length;
+            return {
+                name: subject,
+                totalStudents: 87, // Replace with actual if available
+                attendanceCount: count
+            };
+        });
+
+        res.json({ subjects: subjectsWithAttendance });
+
     } catch (error) {
         console.error("Error fetching teacher data:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
 
 exports.markAttendance = async (req, res) => {
     const { subject, date, time, present_students } = req.body;
@@ -253,3 +301,81 @@ exports.getAbsentStudents = async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 };
+
+
+
+exports.getLowAttendanceStudents = async (req, res) => {
+    try {
+        const teacherId = req.teacher.id;
+
+
+        // Fetch teacher
+        const teacher = await Teacher.findById(teacherId).lean();
+        if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
+
+        // Fetch all students
+        const students = await Student.find({}).lean();
+
+
+        // Prepare map: subject -> roll_no -> {present, total}
+        const subjectMap = {};
+
+
+        // Loop over attendanceRecords
+        teacher.attendanceRecords.forEach(record => {
+            const subject = record.subject;
+            if (!subjectMap[subject]) subjectMap[subject] = {};
+
+
+            // Mark present students
+            record.present_roll_numbers.forEach(roll => {
+                if (!subjectMap[subject][roll]) subjectMap[subject][roll] = { present: 0, total: 0 };
+                subjectMap[subject][roll].present += 1;
+                subjectMap[subject][roll].total += 1;
+            });
+
+
+            // Count absentees
+            students.forEach(student => {
+                if (!record.present_roll_numbers.includes(student.roll_no)) {
+                    if (!subjectMap[subject][student.roll_no]) subjectMap[subject][student.roll_no] = { present: 0, total: 0 };
+                    subjectMap[subject][student.roll_no].total += 1;
+                }
+            });
+        });
+
+
+        // Prepare final low attendance array
+        const lowAttendance = [];
+
+
+        Object.keys(subjectMap).forEach(subject => {
+            const rolls = subjectMap[subject];
+            Object.keys(rolls).forEach(roll => {
+                const { present, total } = rolls[roll];
+                if (total > 0) {
+                    const percentage = (present / total) * 100;
+                    if (percentage < 25) {
+                        const student = students.find(s => s.roll_no === roll);
+                        lowAttendance.push({
+                            subject,
+                            name: student.name,
+                            roll_no: student.roll_no,
+                            percentage: Math.round(percentage)
+                        });
+                    }
+                }
+            });
+        });
+
+
+        res.json({ lowAttendance });
+    } catch (error) {
+        console.error("Error fetching low attendance:", error);
+        res.status(500).json({ message: "Failed to fetch low attendance students" });
+    }
+};
+
+
+
