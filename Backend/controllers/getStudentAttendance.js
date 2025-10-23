@@ -42,9 +42,56 @@ const Student = require("../models/Student"); // Adjust path as needed
 //     }
 // };
 
+// exports.getAttendanceByDate = async (req, res) => {
+//     try {
+//         const  roll_no  = req.student.roll_no;
+//         const { date } = req.query;
+
+//         if (!date) {
+//             return res.status(400).json({ message: "Date is required in query string" });
+//         }
+
+//         const student = await Student.findOne({ roll_no });
+//         if (!student) {
+//             return res.status(404).json({ message: "Student not found" });
+//         }
+
+//         const dateObj = new Date(date);
+//         if (isNaN(dateObj.getTime())) {
+//             return res.status(400).json({ message: "Invalid date format" });
+//         }
+
+//         const formattedDate = dateObj.toISOString().split('T')[0];
+
+//         const attendanceOnDate = student.attendance.filter(
+//             (record) => record.date === formattedDate
+//         );
+
+//         if (attendanceOnDate.length === 0) {
+//             return res.status(404).json({ message: "No attendance found for this date" });
+//         }
+
+//         const formatted = attendanceOnDate.map(record => ({
+//             subject: record.subject,
+//             date: record.date,
+//             time: record.time,
+//             status: record.status
+//         }));
+
+//         res.status(200).json({
+//             roll_no: roll_no,
+//             recentAttendance: formatted
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: "An error occurred while fetching attendance" });
+//     }
+// };
+
+
 exports.getAttendanceByDate = async (req, res) => {
     try {
-        const  roll_no  = req.student.roll_no;
+        const roll_no = req.student.roll_no;
         const { date } = req.query;
 
         if (!date) {
@@ -67,8 +114,13 @@ exports.getAttendanceByDate = async (req, res) => {
             (record) => record.date === formattedDate
         );
 
+        // ✅ Instead of 404, return empty list with message
         if (attendanceOnDate.length === 0) {
-            return res.status(404).json({ message: "No attendance found for this date" });
+            return res.status(200).json({
+                roll_no: roll_no,
+                recentAttendance: [],
+                message: "No attendance marked for this date",
+            });
         }
 
         const formatted = attendanceOnDate.map(record => ({
