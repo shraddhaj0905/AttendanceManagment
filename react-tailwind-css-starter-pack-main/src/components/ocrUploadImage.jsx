@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const OcrUploadImage = () => {
   const [image, setImage] = useState(null);
@@ -20,7 +21,7 @@ const OcrUploadImage = () => {
     formData.append('image', image);
 
     try {
-      const response = await axios.post('http://localhost:4000/api/ocr/image', formData, {
+      const response = await axios.post(`${BACKEND_URL}/api/ocr/image`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -40,7 +41,7 @@ const OcrUploadImage = () => {
       {uploadedImage && (
         <div>
           <h3>Uploaded Image:</h3>
-          <img src={`http://localhost:4000/uploads/${uploadedImage}`} alt="Uploaded" />
+          <img src={`${BACKEND_URL}/uploads/${uploadedImage}`} alt="Uploaded" />
         </div>
       )}
 

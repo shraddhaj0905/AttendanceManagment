@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Calendar from "./ui/calendar";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
 import {
     Card,
     CardContent,
@@ -169,7 +171,7 @@ const fetchStudentData = async () => {
     const roll_no = localStorage.getItem("roll_no");
 
     // Fetch student profile data using the roll number
-    const studentRes = await axios.get(`http://localhost:4000/api/student/rollno/${roll_no}`, {
+    const studentRes = await axios.get(`${BACKEND_URL}/api/student/rollno/${roll_no}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -178,17 +180,17 @@ const fetchStudentData = async () => {
 
     // Fetch attendance stats
     const [totalRes, presentRes] = await Promise.all([
-      axios.get(`http://localhost:4000/api/student/attendance/total/${roll_no}`, {
+      axios.get(`${BACKEND_URL}/api/student/attendance/total/${roll_no}`, {
         headers: { Authorization: `Bearer ${token}` }
       }),
-      axios.get(`http://localhost:4000/api/student/attendance/present/${roll_no}`, {
+      axios.get(`${BACKEND_URL}/api/student/attendance/present/${roll_no}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
     ]);
 
     // Fetch recent attendance (optional)
     console.log(roll_no);
-    const recentAttendanceRes = await axios.get(`http://localhost:4000/api/student/attendance/recent/roll_no`, {
+    const recentAttendanceRes = await axios.get(`${BACKEND_URL}/api/student/attendance/recent/roll_no`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -247,7 +249,8 @@ useEffect(() => {
             // If your API expects a different format, convert it here
             
             const res = await axios.get(
-                `http://localhost:4000/api/student/attendance/by-date`,
+              //http://localhost:4000/api/student/attendance/recent/roll_no
+                `${BACKEND_URL}/api/student/attendance/by-date`,
                 {
                     params: {
                         

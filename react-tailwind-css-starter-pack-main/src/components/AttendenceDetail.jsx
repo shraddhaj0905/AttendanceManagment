@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
 
 const AttendanceDetail = () => {
     // ... (AttendanceDetail component code from your original file)
@@ -31,7 +33,7 @@ const AttendanceDetail = () => {
 
                 // Option 1: API directly provides absent roll numbers
                 const response = await fetch(
-                    `http://localhost:4000/api/auth/absentees?subject=${encodeURIComponent(record.subject)}&date=${encodeURIComponent(record.date)}&time=${encodeURIComponent(record.time)}`,
+                   `${BACKEND_URL}/api/auth/absentees?subject=${encodeURIComponent(record.subject)}&date=${encodeURIComponent(record.date)}&time=${encodeURIComponent(record.time)}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`

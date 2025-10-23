@@ -4,6 +4,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
 
 
 const AllAttendanceRecords = () => {
@@ -21,7 +23,7 @@ const AllAttendanceRecords = () => {
                 if (!token) throw new Error('Authentication token not found');
 
 
-                const response = await fetch('http://localhost:4000/api/auth/recent', {
+                const response = await fetch(`${BACKEND_URL}/api/auth/recent`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 

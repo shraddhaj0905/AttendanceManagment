@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const AttendancePage = () => {
     const { className } = useParams();
@@ -84,7 +85,7 @@ const AttendancePage = () => {
         // setIsLoading(true); // You might want a specific loading state for OCR
 
         try {
-            const response = await fetch('http://localhost:4000/api/ocr/image', {
+            const response = await fetch(`${BACKEND_URL}/api/ocr/image`, {
                 method: 'POST',
                 body: formData,
             });
@@ -336,7 +337,7 @@ const AttendancePage = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:4000/api/auth/mark', {
+            const response = await fetch(`${BACKEND_URL}/api/auth/mark`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -379,7 +380,7 @@ const AttendancePage = () => {
                 setIsLoading(false);
                 return;
             }
-            const response = await fetch(`http://localhost:4000/api/attendance/${encodeURIComponent(className)}/${encodeURIComponent(attendanceDate)}`);
+            const response = await fetch(`${BACKEND_URL}/api/attendance/${encodeURIComponent(className)}/${encodeURIComponent(attendanceDate)}`);
 
              if (response.status === 404) {
                 alert(`No attendance record found for ${className} on ${new Date(attendanceDate).toLocaleDateString()}.`);

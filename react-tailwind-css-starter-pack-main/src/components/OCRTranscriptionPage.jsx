@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const OcrTranscriptionPage = () => {
     const { className } = useParams();
@@ -46,7 +47,7 @@ const OcrTranscriptionPage = () => {
         formData.append('image', classImage);
 
         try {
-            const response = await fetch('http://localhost:4000/api/ocr/image', {
+            const response = await fetch(`${BACKEND_URL}/api/ocr/image`, {
                 method: 'POST',
                 body: formData,
             });
